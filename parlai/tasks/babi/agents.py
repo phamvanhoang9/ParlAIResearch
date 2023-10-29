@@ -46,7 +46,7 @@ class Task1kTeacher(FbDeprecatedDialogTeacher):
     def __init__(self, opt, shared=None):
         default = '1'
         task = opt.get('task', f'babi:Task1k:{default}')
-        self.task_num = task.split(':')[2] if len(task.split(':')) >= 3 else default
+        self.task_num = task.split(':')[2] if len(task.split(':')) >= 3 else default 
         # Default to self.task_num == '1' if not specified
         opt['datafile'] = _path('', self.task_num, opt)
         opt['cands_datafile'] = _path('', self.task_num, opt, 'train')

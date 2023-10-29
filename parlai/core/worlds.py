@@ -317,7 +317,7 @@ class DialogPartnerWorld(World):
     chance to speak per turn and passing that back to the other one.
     """
 
-    @classmethod
+    @classmethod # classmethod is a decorator that is an alternative to creating a staticmethod
     def add_cmdline_args(
         cls, parser: ParlaiParser, partial_opt: Optional[Opt] = None
     ) -> ParlaiParser:
@@ -326,13 +326,13 @@ class DialogPartnerWorld(World):
 
         Self-chat-specific world flags can be added here.
         """
-        return parser
+        return parser 
 
     def __init__(self, opt: Opt, agents=None, shared=None):
-        if not ((agents is not None) ^ (shared is not None)):
+        if not ((agents is not None) ^ (shared is not None)): # means that either agents or shared must be None
             raise ValueError('You must supply either agents or shared, but not both.')
-        super().__init__(opt)
-        if shared:
+        super().__init__(opt) # calls the parent class's __init__ method
+        if shared: # if shared is not None
             # Create agents based on shared data.
             self.agents = create_agents_from_shared(shared['agents'])
         else:
@@ -340,16 +340,16 @@ class DialogPartnerWorld(World):
                 raise RuntimeError('There must be exactly two agents for this world.')
             # Add passed in agents directly.
             self.agents = agents
-        self.acts = [None] * len(self.agents)
+        self.acts = [None] * len(self.agents) # acts is a list of length 2, with each element being None
         if self.agents is not None and len(self.agents) > 0:
             # Name the world after the first agent.
-            self.id = self.get_task_agent().getID()
+            self.id = self.get_task_agent().getID() # getID is a method of the Teacher class
 
     def get_task_agent(self):
         """
         Return task agent.
         """
-        return self.get_agents()[0]
+        return self.get_agents()[0] # self.get_agents() returns a list of length 2, so this returns the first element
 
     def get_model_agent(self):
         """
@@ -363,13 +363,13 @@ class DialogPartnerWorld(World):
 
         Alternate between the two agents.
         """
-        acts = self.acts
-        agents = self.agents
-        acts[0] = agents[0].act()
-        agents[1].observe(validate(acts[0]))
-        acts[1] = agents[1].act()
-        agents[0].observe(validate(acts[1]))
-        self.update_counters()
+        acts = self.acts # acts is a list of length 2, with each element being None
+        agents = self.agents # agents is a list of length 2, with each element being an agent
+        acts[0] = agents[0].act() # acts[0] is None, agents[0] is an agent, so this is calling the act method of the agent
+        agents[1].observe(validate(acts[0])) # validate is a function defined in this file, acts[0] is None, so this is calling the observe method of the agent
+        acts[1] = agents[1].act() # acts[1] is None, agents[1] is an agent, so this is calling the act method of the agent
+        agents[0].observe(validate(acts[1])) # validate is a function defined in this file, acts[1] is None, so this is calling the observe method of the agent
+        self.update_counters() # this is a method of the World class that updates how many epochs have completed
 
     def episode_done(self):
         """
@@ -389,6 +389,7 @@ class DialogPartnerWorld(World):
     def report(self):
         """
         Report all metrics of all subagents.
+        It used to be that the first agent would report, but this is no longer the case.
         """
         from parlai.core.metrics import Metric, LegacyMetric
 
@@ -412,8 +413,11 @@ class DialogPartnerWorld(World):
         Return number of examples.
         """
         if hasattr(self.get_task_agent(), 'num_examples'):
+            """
+            hasattr is a function that returns True if the object has the specified attribute
+            """
             return self.get_task_agent().num_examples()
-        return 0
+        return 0 # if the task agent does not have a num_examples method, return 0
 
     def num_episodes(self):
         """
