@@ -26,12 +26,12 @@ Afterwards, you can play with --beam-size to see how responses differ with
 different beam lengths.
 """  # noqa: E501
 
-from typing import Optional
-from parlai.core.params import ParlaiParser
-from parlai.core.opt import Opt
+from typing import Optional # typing is a python library for type hints, which are used to specify the expected type of an argument to a function or the return type of a function. Optional is a type hint for an optional argument.
+from parlai.core.params import ParlaiParser # ParlaiParser is a subclass of argparse.ArgumentParser, which is a command line argument parser. It is used to parse the command line arguments passed to a program.   
+from parlai.core.opt import Opt # Opt is a class that represents the options passed to a model. It is a subclass of dict.
 import torch.nn as nn
 import torch.nn.functional as F
-import parlai.core.torch_generator_agent as tga
+import parlai.core.torch_generator_agent as tga # tga is a module that contains the base class for torch generator agents.
 
 
 class Encoder(nn.Module):
@@ -166,9 +166,8 @@ class ExampleModel(tga.TorchGeneratorModel):
         Since encoder_state can be arbitrary, you must implement this yourself.
         Typically you will just want to index select on the batch dimension.
         """
-        h, c = encoder_states
-        return h[:, indices, :], c[:, indices, :]
-
+        h, c = encoder_states 
+        return h[:, indices, :], c[:, indices, :] # h[:, indices, :] is a tensor of shape [1, 32, 1024] where 32 is the batch size and 1024 is the hidden size.
     def reorder_decoder_incremental_state(self, incr_state, indices):
         """
         Reorder the decoder states to select only the given batch indices.

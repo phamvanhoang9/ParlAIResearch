@@ -100,7 +100,7 @@ class SearchBlocklist(object):
 TSType = TypeVar('TSType', bound='TreeSearch')
 
 
-class TorchGeneratorModel(nn.Module, ABC):
+class TorchGeneratorModel(nn.Module, ABC): # ABC = Abstract Base Class
     """
     Abstract TorchGeneratorModel.
 
@@ -131,6 +131,11 @@ class TorchGeneratorModel(nn.Module, ABC):
         self.END_IDX = end_idx
         self.START_IDX = start_idx
         self.register_buffer('START', torch.LongTensor([start_idx]))
+        """
+        Why do we register buffer for START?
+        
+        The reason is that we want to use START as a constant tensor in the model.
+        If we don't register buffer, then START will be a tensor that is part of the model's parameters."""
         self.longest_label = longest_label
 
     def _get_initial_forced_decoder_input(self, bsz: int, inputs: torch.LongTensor):
@@ -145,7 +150,15 @@ class TorchGeneratorModel(nn.Module, ABC):
         :return initial_input:
             initial input for the decoder.
         """
-        return torch.cat([self.START.detach().expand(bsz, 1), inputs], 1)
+
+        # self.START.detach() is a tensor of shape [1] with value [1], why using detach()?
+        # detach() is used to prevent gradients from flowing back into the encoder.
+        # Why do we need to prevent gradients from flowing back into the encoder?
+        # Because we don't want to update the encoder parameters when we are training the decoder.
+        # expand(bsz, 1)? Why do we need to expand the tensor?
+        # Because we want to generate the same initial input for each example in the batch.
+        # 1 is the length of the initial input.
+        return torch.cat([self.START.detach().expand(bsz, 1), inputs], 1) # the shape input is [bsz, seqlen]
 
     def decode_forced(self, encoder_states, ys):
         """
@@ -171,10 +184,12 @@ class TorchGeneratorModel(nn.Module, ABC):
         :rtype:
             (FloatTensor[bsz, ys, vocab], LongTensor[bsz, ys])
         """
-        bsz = ys.size(0)
+        bsz = ys.size(0) # ys size is [bsz, seqlen]
         seqlen = ys.size(1)
-        inputs = ys.narrow(1, 0, seqlen - 1)
-        if (ys[:, 0] == self.START_IDX).any():
+        inputs = ys.narrow(1, 0, seqlen - 1) # narrow(1, 0, seqlen - 1) is to get the first seqlen - 1 tokens in ys along the 1st dimension (the batch dimension)
+        # why don't we include the last token in ys?
+        # because we want to use the last token in ys as the target token to predict.
+        if (ys[:, 0] == self.START_IDX).any(): # any() is to check if there is any element in the tensor that is equal to self.START_IDX
             raise AssertionError(
                 "The Beginning of Sentence token is automatically added to the "
                 "label in decode_forced, but you included it in the label. This means "
@@ -183,11 +198,11 @@ class TorchGeneratorModel(nn.Module, ABC):
             )
         inputs = self._get_initial_forced_decoder_input(bsz, inputs)
         latent, _ = self.decoder(inputs, encoder_states)
-        logits = self.output(latent)
+        logits = self.output(latent) # logits is a tensor of shape [bsz, seqlen, vocab_size]
         _, preds = logits.max(dim=2)
         return logits, preds
 
-    @abstractmethod
+    @abstractmethod # abstractmethod is used to mark a method as abstract, which means that it must be implemented by the child class.
     def reorder_encoder_states(self, encoder_states, indices):
         """
         Reorder encoder states according to a new set of indices.

@@ -23,32 +23,59 @@ parlai train_model --model seq2seq --task babi:Task10k:1 --model-file '/tmp/mode
 
 # TODO List:
 # * More logging (e.g. to files), make things prettier.
-import copy
-import random
-import torch
-import json
-import os
-import signal
-from typing import Tuple
+import copy # copy is a module that provides generic copying operations.
+import random # random is a module that implements pseudo-random number generators for various distributions.
+import torch # torch is a module that provides an n-dimensional array object, with a variety of operations.
+import json # json is a module that provides an interface to encode and decode JSON data.
+import os # os is a module that provides a portable way of using operating system dependent functionality.
+import signal # signal is a module that provides mechanisms to use signal handlers in Python. A signal handler is a function that is called when a signal is received.
+from typing import Tuple # typing is a python library for type hints, which are used to specify the expected type of an argument to a function or the return type of a function. Tuple is a type hint for a tuple.
 
 import numpy as np
 
-import parlai.utils.logging as logging
+import parlai.utils.logging as logging # logging is a module that defines functions and classes which implement a flexible event logging system for applications and libraries.
 from parlai.core.agents import create_agent, create_agent_from_shared
-from parlai.core.exceptions import StopTrainException
+"""
+creat_agent is a function that creates an agent from the options.
+create_agent_from_shared is a function that creates an agent from a shared model.
+"""
+from parlai.core.exceptions import StopTrainException # StopTrainException is a class that represents an exception that is raised when training should stop.
 from parlai.core.logs import TensorboardLogger, WandbLogger, ClearMLLogger
+"""
+TensorboardLogger is a class that logs metrics to tensorboard.
+WandbLogger is a class that logs metrics to wandb.
+ClearMLLogger is a class that logs metrics to clearml.
+"""
 from parlai.core.metrics import Metric
+"""
+Metric is a class that represents a metric.
+Some metrics in ParlAI are computed over the entire dataset, and some are computed over a single example.
+E.g. accuracy is computed over the entire dataset, while F1 is computed over a single example.
+"""
 from parlai.core.metrics import (
     aggregate_named_reports,
     aggregate_unnamed_reports,
     dict_report,
 )
+"""
+params:
+aggregate_named_reports: a function that aggregates named reports.
+aggregate_unnamed_reports: a function that aggregates unnamed reports.
+dict_report: a function that returns a dict report.
+"""
 from parlai.core.opt import Opt
 from parlai.core.params import ParlaiParser, print_announcements
 from parlai.core.script import ParlaiScript, register_script
+"""
+ParlaiScript is a class that represents a script
+register_script is a function that registers a script.
+"""
 from parlai.core.worlds import create_task, World
 from parlai.scripts.build_dict import build_dict, setup_args as setup_dict_args
 from parlai.scripts.eval_model import get_task_world_logs
+"""
+get_task_world_logs is a function that returns the world logs for a task.
+"""
 from parlai.utils.distributed import (
     sync_object,
     is_primary_worker,

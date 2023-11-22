@@ -10,11 +10,15 @@ The Message object's key function is to prevent users from editing fields in an 
 or observation dict unintentionally.
 """
 
-from __future__ import annotations
+from __future__ import annotations # for type hints of classmethods, the purpose of this is to allow you to type hint a classmethod as returning the same type as the class that declares it.
 from typing import Any, Dict
+"""
+Any: Any type is acceptable
+Dict: A dictionary is a collection which is unordered, changeable and indexed. In Python dictionaries are written with curly brackets, and they have keys and values.
+"""
 
 
-UNSAFE_FIELDS = {'metrics'}
+UNSAFE_FIELDS = {'metrics'} # metrics is a field that is used to store metrics for the agent, and is not safe to send to a client.
 
 
 class Message(dict):
@@ -25,7 +29,7 @@ class Message(dict):
     key that already exists in the dict.
     """
 
-    def __setitem__(self, key, val):
+    def __setitem__(self, key, val): # __setitem__ is a method that is called when you assign a value to an item in a dictionary.
         if key in self:
             raise RuntimeError(
                 'Message already contains key `{}`. If this was intentional, '
@@ -38,8 +42,10 @@ class Message(dict):
 
     def copy(self):
         return type(self)(self)
-
-    @classmethod
+    """
+    type() returns the type of the object or creates a new type object with the specified name, bases (or tuple of bases) and dict(dict describes the attributes of the class).
+    """
+    @classmethod # classmethod is a method that is bound to a class rather than its object.
     def padding_example(cls) -> Message:
         """
         Create a Message for batch padding.
@@ -52,7 +58,7 @@ class Message(dict):
         """
         return bool(self.get('batch_padding'))
 
-    def json_safe_payload(self) -> Dict[str, Any]:
+    def json_safe_payload(self) -> Dict[str, Any]: # Dict[str, Any] is a dictionary with string keys and any type of values.
         """
         Prepare a Message for delivery to a client via json.
 
@@ -61,4 +67,4 @@ class Message(dict):
         Works by stripping known unsafe fields from the message, and converting
         the object to a dict.
         """
-        return {k: v for k, v in self.items() if k not in UNSAFE_FIELDS}
+        return {k: v for k, v in self.items() if k not in UNSAFE_FIELDS} # items() returns a list of tuple pairs (key, value) in the dictionary.
