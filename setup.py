@@ -18,7 +18,7 @@ with open('README.md', encoding="utf8") as f:
     # strip the header and badges etc
     readme = f.read().split('--------------------')[-1]
 
-with open('requirements.txt') as f:
+with open('docker_requirements.txt') as f:
     reqs = []
     for line in f:
         line = line.strip()
