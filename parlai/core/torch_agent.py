@@ -545,6 +545,18 @@ class TorchAgent(ABC, Agent):
             choices=['safe', 'mem_efficient'],
             help='Implementation of FP16 to use',
         )
+        """
+        What is the difference between --fp16 and --fp16-impl?
+        --fp16 is a flag that enables the use of FP16 training. It is a
+        shorthand for setting --fp16-impl to "safe". The --fp16-impl flag
+        allows you to choose between different implementations of FP16
+        training. Currently, ParlAI supports two implementations: "safe" and
+        "mem_efficient". The "safe" implementation is the default and is
+        intended to be a drop-in replacement for FP32 training. The
+        "mem_efficient" implementation is more memory efficient, but may
+        result in different results than FP32 training. See
+        parl.ai/docs/faq.html for more information.
+        """
         agent.add_argument(
             '--force-fp16-tokens',
             type='bool',

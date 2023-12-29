@@ -359,6 +359,7 @@ class TorchGeneratorAgent(TorchAgent, ABC):
             assert 'beam_size' in opt_from_disk
             if opt_from_disk['beam_size'] == 1:
                 method = 'greedy'
+                # greedy method means we don't need to compute scores for all tokens.
             else:
                 method = 'beam'
             opt_from_disk['inference'] = method

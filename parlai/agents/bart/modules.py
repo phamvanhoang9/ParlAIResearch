@@ -47,7 +47,7 @@ class BartModel(TransformerGeneratorModel):
             .detach()
             .expand(bsz, 2)
         )
-        return torch.cat([tens, inputs], 1)
+        return torch.cat([tens, inputs], 1) # BOS EOS + inputs
 
     def reorder_decoder_incremental_state(
         self,

@@ -14,7 +14,7 @@ from typing import Optional
 from parlai.core.params import ParlaiParser
 from typing import Dict, Any
 from abc import abstractmethod
-from itertools import islice
+from itertools import islice # islice is a generator function that returns a slice of an iterable object.
 import os
 from tqdm import tqdm
 import random
@@ -23,7 +23,7 @@ import torch
 
 
 from parlai.core.opt import Opt
-from parlai.utils.distributed import is_distributed
+from parlai.utils.distributed import is_distributed # is_distributed() returns True if the current process is part of a distributed training run.   
 from parlai.core.torch_agent import TorchAgent, Output
 from parlai.utils.misc import warn_once
 from parlai.utils.io import PathManager

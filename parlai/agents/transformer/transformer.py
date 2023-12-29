@@ -29,6 +29,8 @@ import torch
 def _check_positional_embeddings(opt):
     """
     Checks positional embedding compatibility with FSDP.
+    FSDP is short for FullyShardedDataParallel, a distributed training
+    wrapper that shards model parameters across multiple GPUs.
     """
     if not opt.get('learn_positional_embeddings') and should_use_fsdp(opt):
         # note: we're doing on-the-fly setting here, abusing pass-by-reference
@@ -185,8 +187,10 @@ class TransformerRankerAgent(TorchRankerAgent):
     Transformer Ranker Agent.
 
     Implementation of a TorchRankerAgent, where the model is a Transformer
-    """
 
+    TransformerRankerAgent class is specifically tailored for rannking tasks where the goal is to
+    rank a set of items or responses based on their relevance to a given innput.
+    """
     @classmethod
     def add_cmdline_args(
         cls, parser: ParlaiParser, partial_opt: Optional[Opt] = None
@@ -252,10 +256,13 @@ class TransformerRankerAgent(TorchRankerAgent):
         return agent
 
     def _score(self, output, cands):
+        # output.unsqueeze(1) = batch x 1 x dim
+        # output dim: batch x dim
         if cands.dim() == 2:
-            return torch.matmul(output, cands.t())
+            return torch.matmul(output, cands.t()) # cands.t() = dim x batch
         elif cands.dim() == 3:
             return torch.bmm(output.unsqueeze(1), cands.transpose(1, 2)).squeeze(1)
+            # bmm(output.unsqueeze(1), cands.transpose(1, 2)) = batch x 1 x dim
         else:
             raise RuntimeError(
                 'Unexpected candidate dimensions {}' ''.format(cands.dim())
@@ -375,7 +382,7 @@ class TransformerGeneratorAgent(TorchGeneratorAgent):
         Resize the token embeddings when are adding extra special tokens.
         """
         # map extra special tokens carefully
-        new_size = self.model.embeddings.weight.size()[0]
+        new_size = self.model.embeddings.weight.size()[0] # size().[0] = vocab size
         orig_size = state_dict['embeddings.weight'].size()[0]
         logging.info(f'Resizing token embeddings from {orig_size} to {new_size}')
         if new_size <= orig_size:
@@ -390,9 +397,9 @@ class TransformerGeneratorAgent(TorchGeneratorAgent):
         ]:
             # get new_embs
             old_embs = state_dict[emb_weights]
-            new_embs = recursive_getattr(self.model, emb_weights).to(old_embs.device)
+            new_embs = recursive_getattr(self.model, emb_weights).to(old_embs.device) # get the embeddings from the model (encoder, decoder, etc.) and move to the same device as the old embeddings (CPU or GPU).
             # copy over old weights
-            new_embs.data[:orig_size, :] = old_embs.data[:orig_size, :]
+            new_embs.data[:orig_size, :] = old_embs.data[:orig_size, :] # copy over the old weights to the new embeddings (the first orig_size rows).
             # reset in state dict
             state_dict[emb_weights] = new_embs
 
@@ -402,6 +409,7 @@ class TransformerGeneratorAgent(TorchGeneratorAgent):
 class TransformerClassifierAgent(TorchClassifierAgent):
     """
     Classifier based on Transformer.
+    TransformerClassifierAgent is designed to classify text into a fixed set of labels.
     """
 
     @classmethod
