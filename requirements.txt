@@ -60,5 +60,5 @@ contractions~=0.1.72
 fsspec~=2022.2.0
 google-api-core<=2.11.0 # conda install -c conda-forge google-api-core
 openai<=0.27.7
-litellm>=0.1.400
+# litellm>=0.1.400
 # fairseq

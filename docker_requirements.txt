@@ -26,8 +26,8 @@ pexpect==4.7.0
 Pillow==10.0.1
 py-gfm==1.0.2
 py-rouge==1.1
-pyyaml==5.4
-pyzmq==18.1.0
+# pyyaml==5.4
+# pyzmq==18.1.0
 regex>=2021.8.3
 myst-parser<1
 attrs~=20.2.0
@@ -60,4 +60,4 @@ contractions~=0.1.72
 fsspec~=2022.2.0
 google-api-core<=2.11.0
 openai<=0.27.7
-litellm>=0.1.400
+# litellm>=0.1.400
